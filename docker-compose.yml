@@ -1,0 +1,10 @@
+version: '3.5'
+
+services:
+  archibald:
+    container_name: archibald
+    build: .
+    env_file: .env
+    privileged: true
+    volumes:
+      - ./:/var/www/archibald
