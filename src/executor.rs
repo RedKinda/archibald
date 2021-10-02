@@ -5,13 +5,16 @@ use std::str;
 use tokio::process::Command;
 
 use crate::{CodeExecutionResult, CodeToExecute};
+use std::io::Write;
 
 pub(crate) async fn execute_code(program: CodeToExecute) {
     println!("Compiling and executing code! {}", program.code);
     let target_dir = "/var/www/archibald/programs/".to_string() + &*program.id.to_string();
     fs::create_dir_all(&target_dir);
 
-    let mut file = File::create(target_dir + "/submission.cpp");
+    let mut file = File::create(target_dir + "/submission.cpp").expect("File must be able to be created");
+    file.write_all(program.code.as_ref().as_ref()).expect("File must be writable");
+
 
     println!("Initializing isolate");
     Command::new("isolate").arg("--cleanup").output().await;
@@ -19,16 +22,18 @@ pub(crate) async fn execute_code(program: CodeToExecute) {
 
 
     // compile with: isolate --run -p --dir=/a=/var/www/a  -- /usr/bin/g++ /a/b.cpp -o out
+    // working: isolate -p --run --dir=/code=/var/www/archibald/programs/893968669527392376/ -- /usr/bin/g++ /code/submission.cpp -o out
     println!("Compiling...");
     let output = Command::new("isolate")
         .args(&[
-            "--run",
             "-p",
+            "-s",
+            "--run",
             &("--dir=/code=/var/www/archibald/programs/".to_string() + &*program.id.to_string()),
             //"--dir=/usr/bin/ld=/usr/bin/",
             "--",
             "/usr/bin/g++",
-            "-shared",
+            //"-shared",
             "/code/submission.cpp",
             "-o",
             "out"])
@@ -43,7 +48,7 @@ pub(crate) async fn execute_code(program: CodeToExecute) {
     };
 
     println!("Running code!");
-    let run_output = Command::new("isolate").args(&["--run", "--", "out"]).output().await.expect("Run command output");
+    let run_output = Command::new("isolate").args(&["--run", "-s", "--", "out"]).output().await.expect("Run command output");
     let stdout = match str::from_utf8(&run_output.stdout) {
         Ok(v) => v,
         Err(e) => "Invalid UTF-8 sequence"
