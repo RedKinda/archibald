@@ -7,24 +7,28 @@ use tokio::process::Command;
 use crate::{CodeExecutionResult, CodeToExecute};
 
 pub(crate) async fn execute_code(program: CodeToExecute) {
-    let target_dir = "/programs/".to_string() + stringify!(program.id);
+    println!("Compiling and executing code! {}", program.code);
+    let target_dir = "/var/www/archibald/programs/".to_string() + &*program.id.to_string();
     fs::create_dir_all(&target_dir);
 
     let mut file = File::create(target_dir + "/submission.cpp");
 
-    Command::new("isolate").arg("--cleanup");
-    Command::new("isolate").arg("--init");
+    println!("Initializing isolate");
+    Command::new("isolate").arg("--cleanup").output().await;
+    Command::new("isolate").arg("--init").output().await;
 
 
     // compile with: isolate --run -p --dir=/a=/var/www/a  -- /usr/bin/g++ /a/b.cpp -o out
-
-    let output = Command::new("g++")
+    println!("Compiling...");
+    let output = Command::new("isolate")
         .args(&[
             "--run",
             "-p",
-            &("--dir=/code=/var/www/archibald/programs/".to_string() + stringify!(program.id)),
+            &("--dir=/code=/var/www/archibald/programs/".to_string() + &*program.id.to_string()),
+            //"--dir=/usr/bin/ld=/usr/bin/",
             "--",
             "/usr/bin/g++",
+            "-shared",
             "/code/submission.cpp",
             "-o",
             "out"])
@@ -38,6 +42,7 @@ pub(crate) async fn execute_code(program: CodeToExecute) {
         Err(e) => "Invalid UTF-8 sequence"
     };
 
+    println!("Running code!");
     let run_output = Command::new("isolate").args(&["--run", "--", "out"]).output().await.expect("Run command output");
     let stdout = match str::from_utf8(&run_output.stdout) {
         Ok(v) => v,
@@ -55,5 +60,7 @@ pub(crate) async fn execute_code(program: CodeToExecute) {
         compilation_stdout: Box::from(compilation_stdout),
         compilation_stderr: Box::from(compilation_stderr),
     };
+    println!("Result done, sending...");
+    program.oneshot_sender.send(result);
 }
 

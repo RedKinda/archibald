@@ -1,5 +1,5 @@
 mod executor;
-
+use std::env;
 use serenity::{
     async_trait,
     model::{
@@ -13,6 +13,8 @@ use serenity::{
             InteractionResponseType,
         },
     },
+    framework::standard::macros::command,
+    framework::standard::macros::group,
     prelude::*,
 };
 use tokio::sync::mpsc::{Sender, Receiver, channel};
@@ -20,6 +22,8 @@ use serenity::futures::Future;
 use std::pin::Pin;
 use std::task::Poll;
 use serenity::model::channel::Message;
+use serenity::framework::standard::CommandResult;
+use serenity::framework::StandardFramework;
 
 struct Handler;
 
@@ -46,6 +50,9 @@ impl TypeMapKey for CodeQueueSender {
     type Value = Sender<CodeToExecute>;
 }
 
+#[group]
+#[commands(exec)]
+struct General;
 
 #[command]
 async fn exec(ctx: &Context, msg: &Message) -> CommandResult {
@@ -61,11 +68,11 @@ async fn exec(ctx: &Context, msg: &Message) -> CommandResult {
     {
         let data_read = ctx.data.read().await;
         let sender = data_read.get::<CodeQueueSender>().expect("Code queue sender").clone();
-        sender.send(new_program);
+        sender.send(new_program).await;
     }
 
     let result = receiver.await.expect("code execution result");
-    msg.reply(ctx, format!("{}{}", result.stdout, result.stderr)).await?;
+    msg.reply(ctx, format!("```\n{}\n{}\n{}\n{}\n```", result.stdout, result.stderr, result.compilation_stdout, result.compilation_stderr)).await?;
 
     Ok(())
 }
@@ -186,9 +193,9 @@ impl EventHandler for Handler {
 async fn consume_queue(mut receiver: Receiver<CodeToExecute>) {
     loop {
         if let Some(program) = receiver.recv().await {
-            executor::execute_code(program);
+            println!("Received code! Executing...");
+            executor::execute_code(program).await;
         }
-        println!("Received code! Executing...")
     }
 }
 
@@ -196,14 +203,19 @@ async fn consume_queue(mut receiver: Receiver<CodeToExecute>) {
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
-    let token = "ODkzNzgyNTQ4ODY4NjU3MTUy.YVgd3Q.1PdUGIcOy4hRy2LaLIm6yfvG-nE";
+    let token = env::var("BOT_TOKEN").expect("Bot token in .env");
 
     // The Application Id is usually the Bot User Id.
-    let application_id: u64 = 893782548868657152;
+    let application_id: u64 = env::var("APPLICATION_ID").expect("Application ID in .env").parse::<u64>().expect("Application Id to be a u64");
+
+    let framework = StandardFramework::new()
+        .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
+        .group(&GENERAL_GROUP);
 
     // Build our client.
     let mut client = Client::builder(token)
         .event_handler(Handler)
+        .framework(framework)
         .application_id(application_id)
         .await
         .expect("Error creating client");

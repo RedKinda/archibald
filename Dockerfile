@@ -10,7 +10,6 @@ RUN git clone https://github.com/ioi/isolate && \
 
 COPY start.sh ./
 COPY ./src ./archibald/src
-COPY ./target ./archibald/target
 COPY ./Cargo.toml ./archibald/
 
 RUN cd /var/www/archibald && \
