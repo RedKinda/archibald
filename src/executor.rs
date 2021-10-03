@@ -29,12 +29,16 @@ pub(crate) async fn execute_code(program: CodeToExecute) {
         .args(&[
             "-p",
             "-s",
+            "-t",
+            "30",
             "--run",
             &("--dir=/code=/var/www/archibald/programs/".to_string() + &*program.id.to_string()),
             //"--dir=/usr/bin/ld=/usr/bin/",
             "--",
             "/usr/bin/g++",
             //"-shared",
+            "-Wall",
+            "-Wextra",
             "/code/submission.cpp",
             "-o",
             "out"])
@@ -49,7 +53,15 @@ pub(crate) async fn execute_code(program: CodeToExecute) {
     };
 
     println!("Running code!");
-    let run_output = Command::new("isolate").args(&["--run", "-s", "--", "out"]).output().await.expect("Run command output");
+    let run_output = Command::new("isolate").args(&
+        [
+            "--run",
+            "-s",
+            "-t",
+            "30",
+            "--",
+            "out"
+        ]).output().await.expect("Run command output");
     let stdout = match str::from_utf8(&run_output.stdout) {
         Ok(v) => v,
         Err(..) => "Invalid UTF-8 sequence"

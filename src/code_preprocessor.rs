@@ -36,11 +36,13 @@ pub(crate) fn preprocess(program: &str) -> String{
             }
         };
 
-        s.insert_str(start_at, "\nvoid main() ");
+        s.insert_str(start_at, "\nint main() ");
     }
 
-    if !s.contains("return") && s.contains("int main") {
-        s = s.replace("int main", "void main");
+    if !s.contains("return") {
+        let indices: Vec<_> = s.match_indices("}").collect();
+        let last_bracket = indices.last().expect("} must be in code at this point").0;
+        s.insert_str(last_bracket, "\nreturn 0;\n")
     }
 
     if s.contains("cout") {
