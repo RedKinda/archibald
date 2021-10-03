@@ -7,6 +7,7 @@ use tokio::process::Command;
 use crate::{CodeExecutionResult, CodeToExecute};
 use std::io::Write;
 
+
 pub(crate) async fn execute_code(program: CodeToExecute) {
     println!("Compiling and executing code! {}", program.code);
     let target_dir = "/var/www/archibald/programs/".to_string() + &*program.id.to_string();
@@ -40,22 +41,22 @@ pub(crate) async fn execute_code(program: CodeToExecute) {
         .output().await.expect("Compilation output");
     let compilation_stdout = match str::from_utf8(&output.stdout) {
         Ok(v) => v,
-        Err(e) => "Invalid UTF-8 sequence"
+        Err(..) => "Invalid UTF-8 sequence"
     };
     let compilation_stderr = match str::from_utf8(&output.stderr) {
         Ok(v) => v,
-        Err(e) => "Invalid UTF-8 sequence"
+        Err(..) => "Invalid UTF-8 sequence"
     };
 
     println!("Running code!");
     let run_output = Command::new("isolate").args(&["--run", "-s", "--", "out"]).output().await.expect("Run command output");
     let stdout = match str::from_utf8(&run_output.stdout) {
         Ok(v) => v,
-        Err(e) => "Invalid UTF-8 sequence"
+        Err(..) => "Invalid UTF-8 sequence"
     };
     let stderr = match str::from_utf8(&run_output.stderr) {
         Ok(v) => v,
-        Err(e) => "Invalid UTF-8 sequence"
+        Err(..) => "Invalid UTF-8 sequence"
     };
 
     let result = CodeExecutionResult {

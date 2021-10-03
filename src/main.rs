@@ -1,4 +1,6 @@
 mod executor;
+mod code_preprocessor;
+
 use std::env;
 use serenity::{
     async_trait,
@@ -18,9 +20,6 @@ use serenity::{
     prelude::*,
 };
 use tokio::sync::mpsc::{Sender, Receiver, channel};
-use serenity::futures::Future;
-use std::pin::Pin;
-use std::task::Poll;
 use serenity::model::channel::Message;
 use serenity::framework::standard::CommandResult;
 use serenity::framework::StandardFramework;
@@ -51,16 +50,23 @@ impl TypeMapKey for CodeQueueSender {
 }
 
 #[group]
-#[commands(exec)]
+#[commands(exec, process)]
 struct General;
 
 #[command]
 async fn exec(ctx: &Context, msg: &Message) -> CommandResult {
     let (one_sender, receiver) = tokio::sync::oneshot::channel::<CodeExecutionResult>();
-    let source_code = &msg.content[6..];
-    let mut new_program = CodeToExecute {
+    let source_code = {
+        if let Some(referenced_msg) = &msg.referenced_message {
+            referenced_msg.content.as_str()
+        } else {
+            &msg.content.as_str()
+        }
+    };
+    let processed_code = code_preprocessor::preprocess(source_code);
+    let new_program = CodeToExecute {
         id: u64::from(msg.id),
-        code: Box::from(source_code),
+        code: Box::from(processed_code),
         stdin: None,
         oneshot_sender: one_sender
     };
@@ -74,6 +80,14 @@ async fn exec(ctx: &Context, msg: &Message) -> CommandResult {
     let result = receiver.await.expect("code execution result");
     msg.reply(ctx, format!("```\n{}\n{}\n{}\n{}\n```", result.stdout, result.stderr, result.compilation_stdout, result.compilation_stderr)).await?;
 
+    Ok(())
+}
+
+#[command]
+async fn process(ctx: &Context, msg: &Message) -> CommandResult {
+    println!("Processing demo code");
+    let processed = code_preprocessor::preprocess(&msg.content);
+    msg.reply(ctx, format!("```cpp\n{}\n```", processed)).await;
     Ok(())
 }
 
@@ -160,14 +174,14 @@ impl EventHandler for Handler {
 
                     let (one_sender, receiver) = tokio::sync::oneshot::channel::<CodeExecutionResult>();
 
-                    let mut new_program = CodeToExecute {
+                    let new_program = CodeToExecute {
                         id: u64::from(interaction.id()),
                         code: Box::from(source_code),
                         stdin: given_stdin,
                         oneshot_sender: one_sender
                     };
 
-                    sender.send(new_program);
+                    sender.send(new_program).await;
 
                     let result = receiver.await.expect("code execution result");
 
