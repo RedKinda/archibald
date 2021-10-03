@@ -37,6 +37,7 @@ pub(crate) async fn execute_code(program: CodeToExecute) {
             "--",
             "/usr/bin/g++",
             //"-shared",
+            "-B/usr/bin",
             "-Wall",
             "-Wextra",
             "/code/submission.cpp",
