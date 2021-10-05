@@ -31,6 +31,8 @@ pub(crate) async fn execute_code(program: CodeToExecute) {
             "-s",
             "-t",
             "30",
+            "-w",
+            "120",
             "--run",
             &("--dir=/code=/var/www/archibald/programs/".to_string() + &*program.id.to_string()),
             //"--dir=/usr/bin/ld=/usr/bin/",
@@ -59,9 +61,11 @@ pub(crate) async fn execute_code(program: CodeToExecute) {
             "--run",
             "-s",
             "-t",
+            "10",
+            "-w",
             "30",
             "--",
-            "out"
+            "/box/out"
         ]).output().await.expect("Run command output");
     let stdout = match str::from_utf8(&run_output.stdout) {
         Ok(v) => v,

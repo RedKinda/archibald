@@ -214,14 +214,7 @@ async fn consume_queue(mut receiver: Receiver<CodeToExecute>) {
 }
 
 
-#[tokio::main]
-async fn main() {
-    // Configure the client with your Discord bot token in the environment.
-    let token = env::var("BOT_TOKEN").expect("Bot token in .env");
-
-    // The Application Id is usually the Bot User Id.
-    let application_id: u64 = env::var("APPLICATION_ID").expect("Application ID in .env").parse::<u64>().expect("Application Id to be a u64");
-
+pub async fn run(token: String, application_id: u64) {
     let framework = StandardFramework::new()
         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
         .group(&GENERAL_GROUP);
@@ -254,4 +247,15 @@ async fn main() {
     if let Err(why) = client.start().await {
         println!("Client error: {:?}", why);
     }
+}
+
+#[tokio::main]
+async fn main() {
+    // Configure the client with your Discord bot token in the environment.
+    let token = env::var("BOT_TOKEN").expect("Bot token in .env");
+
+    // The Application Id is usually the Bot User Id.
+    let application_id: u64 = env::var("APPLICATION_ID").expect("Application ID in .env").parse::<u64>().expect("Application Id to be a u64");
+
+    run(token, application_id).await;
 }
