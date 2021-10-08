@@ -20,9 +20,10 @@ use serenity::{
     prelude::*,
 };
 use tokio::sync::mpsc::{Sender, Receiver, channel};
-use serenity::model::channel::Message;
-use serenity::framework::standard::CommandResult;
+use serenity::model::channel::{Message, Reaction};
+use serenity::framework::standard::{CommandResult};
 use serenity::framework::StandardFramework;
+
 
 struct Handler;
 
@@ -78,7 +79,9 @@ async fn exec(ctx: &Context, msg: &Message) -> CommandResult {
     }
 
     let result = receiver.await.expect("code execution result");
-    msg.reply(ctx, format!("```\n{}\n{}\n{}\n{}\n```", result.stdout, result.stderr, result.compilation_stdout, result.compilation_stderr)).await?;
+    let replied = msg.reply(ctx, format!("```\n{}\n{}\n{}\n{}\n```", result.stdout, result.stderr, result.compilation_stdout, result.compilation_stderr)).await?;
+
+    replied.react(&ctx, '🗑').await;
 
     Ok(())
 }
@@ -202,6 +205,20 @@ impl EventHandler for Handler {
             };
         }
     }
+
+    async fn reaction_add(&self, ctx: Context, reaction: Reaction) {
+        let my_id = ctx.cache.current_user().await.id;
+        if let Some(author) = &reaction.member {
+            if author.user.as_ref().expect("user from member").id != my_id
+                && reaction.emoji.unicode_eq("🗑") {
+                if let Ok(msg) = &reaction.message(&ctx).await {
+                    if msg.author.id == my_id {
+                        msg.delete(&ctx).await;
+                    }
+                }
+            }
+        }
+    }
 }
 
 async fn consume_queue(mut receiver: Receiver<CodeToExecute>) {
@@ -248,6 +265,7 @@ pub async fn run(token: String, application_id: u64) {
         println!("Client error: {:?}", why);
     }
 }
+
 
 #[tokio::main]
 async fn main() {
