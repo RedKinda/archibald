@@ -23,7 +23,9 @@ class Snipe(commands.Cog):
     def add_snipe(
         self, message: Message, is_deleted: bool, after_content: Optional[str] = None
     ):
-        self.snipes[message.channel.id].append(((message, after_content), is_deleted))
+        self.snipes[message.channel.id].insert(
+            0, ((message, after_content), is_deleted)
+        )
         self.snipes[message.channel.id] = sorted(
             [
                 s
