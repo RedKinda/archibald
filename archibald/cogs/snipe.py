@@ -8,6 +8,7 @@ from discord.app_commands import describe
 class Snipe(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        exclude_users = [332935845004705793]
         # tuple true is when deleted, false when just edited
         self.snipes: Dict[
             int, List[Tuple[Tuple[Message, Optional[str]], bool]]
@@ -15,6 +16,9 @@ class Snipe(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: Message):
+        if message.author.id in self.bot.exclude_users:
+            return
+
         self.snipes[message.channel.id].append(((message, None), True))
         self.snipes[message.channel.id] = sorted(
             self.snipes[message.channel.id][:10],
@@ -24,6 +28,9 @@ class Snipe(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_edit(self, before: Message, after: Message):
+        if before.author.id in self.bot.exclude_users:
+            return
+
         self.snipes[after.channel.id].append(((before, after.content), False))
         self.snipes[after.channel.id] = sorted(
             self.snipes[after.channel.id][:10],
