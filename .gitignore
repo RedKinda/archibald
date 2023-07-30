@@ -2,3 +2,6 @@
 /Cargo.lock
 /.env
 /isolate/
+/.env_prod
+.envdev
+**/__pycache__/**
