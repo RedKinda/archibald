@@ -84,7 +84,7 @@ class Snipe(commands.Cog):
 
             stamp = int(snipe.created_at.timestamp())
 
-            prefix = "Deleted at" if is_deleted else "Edited at"
+            prefix = "🗑️ Deleted at" if is_deleted else "📝 Edited at"
             time = f"<t:{stamp}> (<t:{stamp}:R>)"
 
             description = f"> {snipe.content}"
