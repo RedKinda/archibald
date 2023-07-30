@@ -22,4 +22,4 @@ COPY poetry.lock pyproject.toml /app/
 RUN poetry install
 COPY . /app/
 
-CMD ["python3" "-m" "archibald.main"]
+CMD ["python" "-m" "archibald.main"]
