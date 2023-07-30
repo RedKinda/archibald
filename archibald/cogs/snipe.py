@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class Snipe(commands.Cog):
     def __init__(self, bot: Archibald):
         self.bot = bot
-        self.exclude_users = [332935845004705793]
+        self.exclude_users = [332935845004705793, 277464432043360266]
         # tuple true is when deleted, false when just edited
         self.snipes: Dict[
             int, List[Tuple[Tuple[Message, Optional[str]], bool]]
