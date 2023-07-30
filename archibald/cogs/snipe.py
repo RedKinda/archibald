@@ -1,14 +1,17 @@
 from collections import defaultdict
-from typing import Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 from discord import Embed, Message
 from discord.ext import commands
 from discord.app_commands import describe
 
+if TYPE_CHECKING:
+    from archibald.main import Archibald
+
 
 class Snipe(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Archibald):
         self.bot = bot
-        exclude_users = [332935845004705793]
+        self.exclude_users = [332935845004705793]
         # tuple true is when deleted, false when just edited
         self.snipes: Dict[
             int, List[Tuple[Tuple[Message, Optional[str]], bool]]
@@ -16,7 +19,7 @@ class Snipe(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: Message):
-        if message.author.id in self.bot.exclude_users:
+        if message.author.id in self.exclude_users:
             return
 
         self.snipes[message.channel.id].append(((message, None), True))
@@ -28,7 +31,7 @@ class Snipe(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_edit(self, before: Message, after: Message):
-        if before.author.id in self.bot.exclude_users:
+        if before.author.id in self.exclude_users:
             return
 
         self.snipes[after.channel.id].append(((before, after.content), False))
