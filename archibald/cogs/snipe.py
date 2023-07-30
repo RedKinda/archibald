@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 from discord import Embed, Message
 from discord.ext import commands
@@ -19,29 +20,36 @@ class Snipe(commands.Cog):
             int, List[Tuple[Tuple[Message, Optional[str]], bool]]
         ] = defaultdict(list)
 
+    def add_snipe(
+        self, message: Message, is_deleted: bool, after_content: Optional[str] = None
+    ):
+        self.snipes[message.channel.id].append(((message, after_content), is_deleted))
+        self.snipes[message.channel.id] = sorted(
+            [
+                s
+                for s in self.snipes[message.channel.id][:10]
+                if s[0][0].created_at + timedelta(hours=6) > datetime.now()
+            ],
+            key=lambda m: m[0][0].edited_at or m[0][0].created_at,
+            reverse=True,
+        )
+
     @commands.Cog.listener()
     async def on_message_delete(self, message: Message):
         if message.author.id in self.exclude_users:
             return
 
-        self.snipes[message.channel.id].append(((message, None), True))
-        self.snipes[message.channel.id] = sorted(
-            self.snipes[message.channel.id][:10],
-            key=lambda m: m[0][0].edited_at or m[0][0].created_at,
-            reverse=True,
-        )
+        self.add_snipe(message, True)
 
     @commands.Cog.listener()
     async def on_message_edit(self, before: Message, after: Message):
         if before.author.id in self.exclude_users:
             return
 
-        self.snipes[after.channel.id].append(((before, after.content), False))
-        self.snipes[after.channel.id] = sorted(
-            self.snipes[after.channel.id][:10],
-            key=lambda m: m[0][0].edited_at or m[0][0].created_at,
-            reverse=True,
-        )
+        if before.content == after.content:
+            return
+
+        self.add_snipe(before, False, after.content)
 
     @commands.hybrid_command()
     @describe(
