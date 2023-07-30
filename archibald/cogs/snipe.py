@@ -104,7 +104,7 @@ class Snipe(commands.Cog):
                     description += f"[Attachment {ind+1}]({attachment.url}) "
 
             embed = Embed(
-                title="Get sniped :3",
+                title="Get sniped",
                 description=description,
                 color=0x00FF00,
             )
