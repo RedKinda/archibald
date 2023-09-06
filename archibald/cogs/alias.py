@@ -6,7 +6,7 @@ from discord.ext import commands
 class link_alias(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.link_map = json.loads(open("src/cogs/links.json").read())['links'];
+        self.link_map = json.loads(open("archibald/cogs/links.json").read())['links'];
         self.add_alias_whitelist = [
             332935845004705793, 
             655144378062471173, 
