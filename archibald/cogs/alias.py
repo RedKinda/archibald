@@ -22,6 +22,13 @@ class link_alias(commands.Cog):
             await message.channel.send(self.link_map[alias])
 
     @commands.slash_command()
+    async def showaliases(self, ctx):
+        alias_list = ""
+        for alias in self.link_map.keys():
+            alias_list += f"{alias[1:]} -> <{self.link_map[alias]}>\n"
+        await ctx.respond(alias_list)
+
+    @commands.slash_command()
     @option(
         name="alias",
         description="alias to add",
