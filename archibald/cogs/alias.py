@@ -25,7 +25,7 @@ class LinkAlias(commands.Cog):
     async def showaliases(self, ctx):
         alias_list = ""
         for alias in self.link_map.keys():
-            alias_list += f"{alias[1:]} - <{self.link_map[alias]}>\n"
+            alias_list += f"{alias} - <{self.link_map[alias]}>\n"
         await ctx.reply(alias_list)
 
     @commands.hybrid_command()
