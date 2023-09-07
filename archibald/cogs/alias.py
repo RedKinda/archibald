@@ -35,8 +35,7 @@ class LinkAlias(commands.Cog):
     )
     @commands.has_any_role(
         "Adult in the Room - Admins", 
-        "Moderators",
-        "admin"
+        "Moderators"
     )
     async def addalias(self, ctx: Context, alias: str, link: str):
         self.link_map[alias] = link
