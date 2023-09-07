@@ -6,7 +6,7 @@ from discord.ext.commands.context import Context
 class LinkAlias(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.link_map: dict[str, str] = json.loads(open("src/cogs/links.json").read())['links'];
+        self.link_map: dict[str, str] = json.loads(open("archibald/cogs/links.json").read())['links'];
         self.admin = 872083306668261437
         self.mod = 1000862083639943228
 
@@ -43,7 +43,7 @@ class LinkAlias(commands.Cog):
     )
     async def addalias(self, ctx: Context, alias, link):
         self.link_map[alias] = link
-        with open("src/cogs/links.json", "w") as f:
+        with open("archibald/cogs/links.json", "w") as f:
             json.dump({"links": self.link_map}, f)
         await ctx.reply(f"added alias {alias} for link {link}", ephemeral=True)
 
