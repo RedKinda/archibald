@@ -22,7 +22,9 @@ class Literally1984(commands.Cog):
         self.banned_strings = ["many shirtless men mediating? yeah thatd get me hard"]
 
     def ocr(self, image: Image.Image) -> str:
-        return pytesseract.image_to_string(image)
+        res = pytesseract.image_to_string(image)
+        print("OCR'd" + res)
+        return res
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
