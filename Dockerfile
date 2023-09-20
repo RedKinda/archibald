@@ -1,4 +1,4 @@
-FROM python:3.11-slim-buster AS base
+FROM python:3.11 AS base
 
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random \
@@ -11,7 +11,8 @@ ENV PIP_DEFAULT_TIMEOUT=100 \
 
 RUN apt update
 RUN apt install git -y
-RUN apt-get install --yes --no-install-recommends gcc g++ libffi-dev tesseract-ocr tesseract-ocr-eng
+RUN apt-get install --yes --no-install-recommends gcc g++ libffi-dev && \
+    apt-get install --yes tesseract-ocr
 
 RUN pip install -U poetry
 RUN pip install wheel
