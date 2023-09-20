@@ -34,8 +34,8 @@ class LinkAlias(commands.Cog):
         link="link to be accessed via the alias"
     )
     @commands.has_any_role(
-        "Adult in the Room - Admins", 
-        "Moderators"
+        872083306668261437, # admin
+        1000862083639943228 # mod
     )
     async def addalias(self, ctx: Context, alias: str, link: str):
         self.link_map[alias] = link
