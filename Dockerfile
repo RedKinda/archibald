@@ -11,7 +11,7 @@ ENV PIP_DEFAULT_TIMEOUT=100 \
 
 RUN apt update
 RUN apt install git -y
-RUN apt-get install --yes --no-install-recommends gcc g++ libffi-dev
+RUN apt-get install --yes --no-install-recommends gcc g++ libffi-dev tesseract-ocr
 
 RUN pip install -U poetry
 RUN pip install wheel
