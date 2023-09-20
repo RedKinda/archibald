@@ -1,4 +1,8 @@
-from os import environ
+from os import environ, getenv
+from dotenv import load_dotenv
+
+DOTENV_PATH = getenv("DOTENV_PATH", None)
+load_dotenv(DOTENV_PATH)
 
 BOT_TOKEN = environ["BOT_TOKEN"]
 
