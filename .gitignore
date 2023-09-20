@@ -5,3 +5,4 @@
 /.env_prod
 .envdev
 **/__pycache__/**
+/archibald/cogs/links.json
