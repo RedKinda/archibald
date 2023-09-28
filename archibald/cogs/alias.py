@@ -14,10 +14,6 @@ class LinkAlias(commands.Cog):
         self.links_fp = LINKS_JSON_PATH
         self.link_map: dict[str, str] = json.loads(open(self.links_fp).read())["links"]
 
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx: Context, error):
-        await ctx.send(f"{error} {ctx.author.name}")
-
     @commands.hybrid_command()
     @describe(alias="the alias of the link you want")
     async def link(self, ctx: Context, alias: str):
