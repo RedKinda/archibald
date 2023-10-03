@@ -13,9 +13,9 @@ class Susbot(commands.Cog):
     def __init__(self, bot: Archibald):
         self.bot = bot
         self.phrase_mappings = {
-            "grind": "�",
-            "cum laude": "�",
-            "gpa": "�",
+            "grind": "\U0001f629",
+            "cum laude": "\U0001f633",
+            "gpa": "\U0001f629",
         }
 
     @commands.Cog.listener()
