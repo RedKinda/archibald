@@ -16,6 +16,8 @@ class Susbot(commands.Cog):
             "grind": "\U0001f629",
             "cum laude": "\U0001f633",
             "gpa": "\U0001f629",
+            "anal": "\U0001f633",
+            "white": "\U0001faf5",
         }
 
     @commands.Cog.listener()
