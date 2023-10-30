@@ -18,7 +18,7 @@ class Susbot(commands.Cog):
             "gpa": "\U0001f629",
             "anal": "\U0001f633",
             "white": "\U0001faf5",
-            ":3": "<coy:1100198097113579590>",
+            ":3": "<:coy:1168526430456512575>",
         }
 
     @commands.Cog.listener()
