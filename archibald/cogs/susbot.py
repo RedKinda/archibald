@@ -18,7 +18,7 @@ class Susbot(commands.Cog):
             "gpa": "\U0001f629",
             "anal": "\U0001f633",
             "white": "\U0001faf5",
-            ":3": 1100198097113579590,
+            ":3": "<coy:1100198097113579590>",
         }
 
     @commands.Cog.listener()
@@ -26,10 +26,7 @@ class Susbot(commands.Cog):
         for phrase, emoji in self.phrase_mappings.items():
             if phrase in message.content.lower():
                 if random.random() < 0.15:
-                    if isinstance(emoji, int):
-                        emoji = self.bot.get_emoji(emoji)
-
-                    await message.add_reaction(emoji)  # type: ignore
+                    await message.add_reaction(emoji)
 
 
 async def setup(bot):
