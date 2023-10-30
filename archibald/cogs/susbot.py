@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import random
 from typing import TYPE_CHECKING
-from discord import Message
+from discord import Message, PartialEmoji
 from discord.ext import commands
 
 if TYPE_CHECKING:
@@ -18,13 +18,14 @@ class Susbot(commands.Cog):
             "gpa": "\U0001f629",
             "anal": "\U0001f633",
             "white": "\U0001faf5",
+            ":3": PartialEmoji(name="coy", id=1100198097113579590),
         }
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
         for phrase, emoji in self.phrase_mappings.items():
             if phrase in message.content.lower():
-                if random.random() < 0.2:
+                if random.random() < 0.15:
                     await message.add_reaction(emoji)
 
 
