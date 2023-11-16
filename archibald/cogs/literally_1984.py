@@ -4,6 +4,7 @@ import asyncio
 from collections import defaultdict
 from datetime import datetime, timedelta
 import io
+import math
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 from discord import Attachment, Embed, Message
 from discord.ext import commands
@@ -36,7 +37,7 @@ class Literally1984(commands.Cog):
 
         for banned_string in self.banned_strings:
             banlen = len(banned_string)
-            tolerance = int(banlen * 0.1)
+            tolerance = math.ceil(banlen * 0.1)
 
             if banlen - tolerance > len(to_check):
                 continue
