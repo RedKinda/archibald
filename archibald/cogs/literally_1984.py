@@ -35,16 +35,19 @@ class Literally1984(commands.Cog):
         # check every substring slice for levehnstein distance of string
 
         for banned_string in self.banned_strings:
-            tolerance = int(len(banned_string) * 0.1)
-            for i in range(0, len(to_check) - len(banned_string), 1):
-                if Levenshtein.distance(to_check[i:], banned_string) <= tolerance:
+            banlen = len(banned_string)
+            tolerance = int(banlen * 0.1)
+            for i in range(0, len(to_check) - banlen, 1):
+                c = to_check[i : banlen + i]
+                dis = Levenshtein.distance(c, banned_string)
+                print(f"distance of {banned_string} - '{c}' is {dis}")
+                if dis <= tolerance:
                     return True
 
         return False
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
-        # run tesseract OCR if it has an attachment
         banned = False
 
         if message.attachments:
