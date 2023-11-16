@@ -19,16 +19,34 @@ if TYPE_CHECKING:
 class Literally1984(commands.Cog):
     def __init__(self, bot: Archibald):
         self.bot = bot
-        self.banned_strings = ["many shirtless men mediating? yeah thatd get me hard", "DICK DICK DICK", "watch her misspell that"]
+        self.banned_strings = [
+            "many shirtless men mediating? yeah thatd get me hard",
+            "DICK DICK DICK",
+            "watch her misspell that",
+            "schizo",
+        ]
 
     def ocr(self, image: Image.Image) -> str:
         res = pytesseract.image_to_string(image)
         print("OCR'd" + res)
         return res
 
+    def string_banned(self, to_check: str) -> bool:
+        # check every substring slice for levehnstein distance of string
+
+        for banned_string in self.banned_strings:
+            tolerance = int(len(banned_string) * 0.1)
+            for i in range(0, len(to_check) - len(banned_string), 1):
+                if Levenshtein.distance(to_check[i:], banned_string) <= tolerance:
+                    return True
+
+        return False
+
     @commands.Cog.listener()
     async def on_message(self, message: Message):
         # run tesseract OCR if it has an attachment
+        banned = False
+
         if message.attachments:
             for attachment in message.attachments:
                 att = await attachment.read()
@@ -36,20 +54,16 @@ class Literally1984(commands.Cog):
                 res = await asyncio.get_running_loop().run_in_executor(
                     None, self.ocr, image
                 )
-                for line in res.split("\n"):
-                    # if levehnstein distance is less than 10% of the length of any of the banned strings
-                    if any(
-                        [
-                            Levenshtein.distance(line, banned_string)
-                            < len(banned_string) * 0.1
-                            for banned_string in self.banned_strings
-                        ]
-                    ):
-                        await message.delete()
-                        await message.channel.send(
-                            f"{message.author.mention} literally 1984"
-                        )
-                        return
+                if self.string_banned(res):
+                    banned = True
+                    break
+
+        banned = banned or self.string_banned(message.content)
+
+        if banned:
+            await message.delete()
+            await message.channel.send(f"{message.author.mention} literally 1984")
+            return
 
 
 async def setup(bot):
