@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class Literally1984(commands.Cog):
     def __init__(self, bot: Archibald):
         self.bot = bot
-        self.banned_strings = ["many shirtless men mediating? yeah thatd get me hard", "DICK DICK DICK"]
+        self.banned_strings = ["many shirtless men mediating? yeah thatd get me hard", "DICK DICK DICK", "watch her misspell that"]
 
     def ocr(self, image: Image.Image) -> str:
         res = pytesseract.image_to_string(image)
