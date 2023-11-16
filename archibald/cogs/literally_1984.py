@@ -38,12 +38,13 @@ class Literally1984(commands.Cog):
             banlen = len(banned_string)
             tolerance = int(banlen * 0.1)
 
-            if banlen + tolerance < len(to_check):
+            if banlen - tolerance > len(to_check):
                 continue
 
             for i in range(0, len(to_check) - banlen + 1, 1):
                 c = to_check[i : banlen + i]
                 dis = Levenshtein.distance(c, banned_string)
+                print(f"distance of {banned_string} - '{c}' is {dis}")
                 if dis <= tolerance:
                     return True
 
