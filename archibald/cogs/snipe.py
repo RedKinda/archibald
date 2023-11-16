@@ -30,7 +30,7 @@ class Snipe(commands.Cog):
             [
                 s
                 for s in self.snipes[message.channel.id][:10]
-                if s[0][0].created_at + timedelta(hours=6) > datetime.utcnow()
+                if datetime.utcnow() - s[0][0].created_at < timedelta(hours=6)
             ],
             key=lambda m: m[0][0].edited_at or m[0][0].created_at,
             reverse=True,
