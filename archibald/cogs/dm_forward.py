@@ -26,6 +26,9 @@ class DMForwarder(commands.Cog):
         if message.author.id == self.owner_id:
             return
 
+        if message.author.bot:
+            return
+
         if message.guild is None:
             await self.owner.send(f"{message.author.display_name}: {message.content}")
 

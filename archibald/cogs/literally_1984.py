@@ -25,6 +25,7 @@ class Literally1984(commands.Cog):
             "DICK DICK DICK",
             "watch her misspell that",
             "schizo",
+            "schizo thread",
         ]
 
     def ocr(self, image: Image.Image) -> str:
@@ -54,6 +55,9 @@ class Literally1984(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: Message):
         banned = False
+
+        if message.author.bot:
+            return
 
         if message.attachments:
             for attachment in message.attachments:
