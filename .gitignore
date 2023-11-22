@@ -1,8 +1,0 @@
-/target
-/Cargo.lock
-/.env
-/isolate/
-/.env_prod
-.envdev
-**/__pycache__/**
-*.json
