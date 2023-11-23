@@ -24,7 +24,7 @@ class Literally1984(commands.Cog):
             "many shirtless men mediating? yeah thatd get me hard",
             "DICK DICK DICK",
             "watch her misspell that",
-            "schizo",
+            # "schizo",
             "schizo thread",
         ]
 
